@@ -4,7 +4,7 @@ import { TypingIndicator } from "./TypingIndicator";
 import { SummaryCard } from "./SummaryCard";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { Stethoscope } from "lucide-react";
+import { Stethoscope, Lock } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -233,8 +233,14 @@ export const TriageChat = () => {
         </motion.div>
       </div>
 
-      <div className="flex-1 overflow-y-auto rounded-xl bg-gray-100 p-4">
-        <div className="space-y-4">
+      <div className="relative flex-1 overflow-y-auto rounded-xl bg-gray-100 p-4">
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
+          <div className="bg-black/20 backdrop-blur-sm rounded-lg p-3 text-white text-sm flex items-center justify-center space-x-2">
+            <Lock className="h-4 w-4" />
+            <span>Messages in this chat are end-to-end (hypothetically) encrypted with Quantum Encryption Protocols</span>
+          </div>
+        </div>
+        <div className="space-y-4 pt-14">
           {messages.map((message, index) => (
             <ChatMessage
               key={index}
