@@ -34,6 +34,10 @@ export const TriageChat = () => {
   const { checkEmergencyConditions, generateSummary } = usePatientAssessment();
 
   const addMessage = (text: string, isBot: boolean) => {
+    if (checkForTriggerWords(text)) {
+      setShowTriggerWarning(true);
+      return;
+    }
     setMessages((prev) => [...prev, { text, isBot }]);
   };
 
