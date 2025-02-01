@@ -4,7 +4,8 @@ import { TypingIndicator } from "./TypingIndicator";
 import { SummaryCard } from "./SummaryCard";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { Stethoscope, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
+import { TriageLogo } from "./TriageLogo";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -223,14 +224,7 @@ export const TriageChat = () => {
             Please answer the questions to help us assess your needs.
           </p>
         </div>
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-mint-100"
-        >
-          <Stethoscope className="h-6 w-6 text-mint-600" />
-        </motion.div>
+        <TriageLogo />
       </div>
 
       <div className="relative flex-1 overflow-y-auto rounded-xl bg-gray-100 p-4">
