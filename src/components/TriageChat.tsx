@@ -3,8 +3,17 @@ import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
 import { SummaryCard } from "./SummaryCard";
 import { motion } from "framer-motion";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Stethoscope } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface Message {
   text: string;
@@ -16,8 +25,8 @@ interface PatientInfo {
   duration: string;
   pain: string;
   medication: string;
+  headache: boolean;
   fever: boolean;
-  missedWork: boolean;
   lightSensitive: boolean;
   stiffNeck: boolean;
   rash: boolean;
@@ -30,13 +39,14 @@ export const TriageChat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [stage, setStage] = useState(0);
+  const [showAlert, setShowAlert] = useState(true);
   const [patientInfo, setPatientInfo] = useState<PatientInfo>({
     symptoms: "",
     duration: "",
     pain: "",
     medication: "",
+    headache: false,
     fever: false,
-    missedWork: false,
     lightSensitive: false,
     stiffNeck: false,
     rash: false,
@@ -69,13 +79,16 @@ export const TriageChat = () => {
   };
 
   const calculateAppointmentLength = (info: PatientInfo): number => {
-    let baseLength = 10; // Default appointment length
+    let baseLength = 10;
+    
+    if (info.headache && (info.fever || info.stiffNeck || info.lightSensitive || info.rash)) {
+      return 20; // Emergency case
+    }
     
     // Add time for severe symptoms
     if (info.fever && info.stiffNeck) baseLength = 20;
     else if (info.fever || info.stiffNeck || info.lightSensitive) baseLength = 15;
     
-    // Ensure the length is between 10 and 20 minutes
     return Math.min(20, Math.max(10, Math.round(baseLength / 5) * 5));
   };
 
@@ -86,7 +99,6 @@ export const TriageChat = () => {
     addMessage(userInput, false);
     setUserInput("");
 
-    // Update patient info based on current stage
     const updatedInfo = { ...patientInfo };
     switch (stage) {
       case 0:
@@ -103,6 +115,7 @@ export const TriageChat = () => {
         break;
       case 2:
         updatedInfo.pain = userInput;
+        updatedInfo.headache = userInput.toLowerCase().includes("head");
         await simulateTyping(
           "Have you taken any medications recently for these symptoms?"
         );
@@ -116,40 +129,43 @@ export const TriageChat = () => {
       case 4:
         updatedInfo.fever = userInput.toLowerCase().includes("yes");
         await simulateTyping(
-          "Has this problem stopped you from going to work? (Please answer yes or no)"
-        );
-        break;
-      case 5:
-        updatedInfo.missedWork = userInput.toLowerCase().includes("yes");
-        await simulateTyping(
           "Are you experiencing any sensitivity to light? (Please answer yes or no)"
         );
         break;
-      case 6:
+      case 5:
         updatedInfo.lightSensitive = userInput.toLowerCase().includes("yes");
         await simulateTyping(
           "Do you have a stiff neck? (Please answer yes or no)"
         );
         break;
-      case 7:
+      case 6:
         updatedInfo.stiffNeck = userInput.toLowerCase().includes("yes");
         await simulateTyping(
           "Have you noticed any recent onset of rash? (Please answer yes or no)"
         );
         break;
-      case 8:
+      case 7:
         updatedInfo.rash = userInput.toLowerCase().includes("yes");
         
-        // Calculate appointment length and determine specialty
+        // Check for emergency conditions
+        if (updatedInfo.headache && (updatedInfo.fever || updatedInfo.stiffNeck || updatedInfo.lightSensitive || updatedInfo.rash)) {
+          toast({
+            variant: "destructive",
+            title: "Emergency Warning",
+            description: "Please call 999 immediately based on your symptoms.",
+          });
+          return;
+        }
+
         const appointmentLength = calculateAppointmentLength(updatedInfo);
         let specialtyArea = "General Practice";
+        
         if (updatedInfo.stiffNeck && updatedInfo.fever && updatedInfo.lightSensitive) {
           specialtyArea = "Emergency Medicine";
         } else if (updatedInfo.rash && updatedInfo.fever) {
           specialtyArea = "Urgent Care";
         }
 
-        // Create more concise presentation summary
         const symptoms = [
           updatedInfo.fever ? "fever" : "",
           updatedInfo.stiffNeck ? "stiff neck" : "",
@@ -180,6 +196,26 @@ export const TriageChat = () => {
 
   return (
     <div className="mx-auto flex h-screen max-w-2xl flex-col bg-gray-50 p-4">
+      <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-600">Emergency Warning</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-4">
+              <p className="font-medium">If you have a severe headache along with any of the following, stop using this service and call 999 immediately:</p>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>Fever</li>
+                <li>Light sensitivity</li>
+                <li>Neck stiffness</li>
+                <li>New onset rash</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>I understand</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Medical Triage Assistant</h1>
