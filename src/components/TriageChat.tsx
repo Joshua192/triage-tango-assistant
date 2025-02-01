@@ -45,7 +45,7 @@ export const TriageChat = () => {
   };
 
   const checkForTriggerWords = (input: string) => {
-    const triggerWords = ["kill", "die"];
+    const triggerWords = ["kill", "die", "death"];
     return triggerWords.some(word => input.toLowerCase().includes(word));
   };
 
