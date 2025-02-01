@@ -10,6 +10,18 @@ interface Message {
   isBot: boolean;
 }
 
+interface PatientInfo {
+  symptoms: string;
+  duration: string;
+  pain: string;
+  medication: string;
+  fever: boolean;
+  missedWork: boolean;
+  lightSensitive: boolean;
+  stiffNeck: boolean;
+  rash: boolean;
+}
+
 export const TriageChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     { text: "What are you in for today? What have you been feeling recently?", isBot: true },
@@ -17,6 +29,17 @@ export const TriageChat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [stage, setStage] = useState(0);
+  const [patientInfo, setPatientInfo] = useState<PatientInfo>({
+    symptoms: "",
+    duration: "",
+    pain: "",
+    medication: "",
+    fever: false,
+    missedWork: false,
+    lightSensitive: false,
+    stiffNeck: false,
+    rash: false,
+  });
   const [summary, setSummary] = useState<{
     appointmentLength: number;
     specialtyArea: string;
@@ -44,6 +67,17 @@ export const TriageChat = () => {
     addMessage(message, true);
   };
 
+  const calculateAppointmentLength = (info: PatientInfo): number => {
+    let baseLength = 10; // Default appointment length
+    
+    // Add time for severe symptoms
+    if (info.fever && info.stiffNeck) baseLength = 20;
+    else if (info.fever || info.stiffNeck || info.lightSensitive) baseLength = 15;
+    
+    // Ensure the length is between 10 and 20 minutes
+    return Math.min(20, Math.max(10, Math.round(baseLength / 5) * 5));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userInput.trim()) return;
@@ -51,32 +85,85 @@ export const TriageChat = () => {
     addMessage(userInput, false);
     setUserInput("");
 
+    // Update patient info based on current stage
+    const updatedInfo = { ...patientInfo };
     switch (stage) {
       case 0:
-        setStage(1);
+        updatedInfo.symptoms = userInput;
         await simulateTyping(
-          "I understand. How long have you been experiencing these symptoms? Have they gotten worse recently?"
+          "How long have you been experiencing these symptoms? Have they gotten worse recently?"
         );
         break;
       case 1:
-        setStage(2);
+        updatedInfo.duration = userInput;
         await simulateTyping(
-          "Thank you for sharing. Are you experiencing any pain? If so, can you rate it from 1-10 and describe its location?"
+          "Are you experiencing any pain? If so, can you rate it from 1-10 and describe its location?"
         );
         break;
       case 2:
-        setStage(3);
+        updatedInfo.pain = userInput;
         await simulateTyping(
-          "I see. Have you tried any medications or treatments for these symptoms?"
+          "Have you taken any medications recently for these symptoms?"
         );
         break;
       case 3:
-        // Process all messages and generate summary
+        updatedInfo.medication = userInput;
+        await simulateTyping(
+          "Do you have a fever? (Please answer yes or no)"
+        );
+        break;
+      case 4:
+        updatedInfo.fever = userInput.toLowerCase().includes("yes");
+        await simulateTyping(
+          "Has this problem stopped you from going to work? (Please answer yes or no)"
+        );
+        break;
+      case 5:
+        updatedInfo.missedWork = userInput.toLowerCase().includes("yes");
+        await simulateTyping(
+          "Are you experiencing any sensitivity to light? (Please answer yes or no)"
+        );
+        break;
+      case 6:
+        updatedInfo.lightSensitive = userInput.toLowerCase().includes("yes");
+        await simulateTyping(
+          "Do you have a stiff neck? (Please answer yes or no)"
+        );
+        break;
+      case 7:
+        updatedInfo.stiffNeck = userInput.toLowerCase().includes("yes");
+        await simulateTyping(
+          "Have you noticed any recent onset of rash? (Please answer yes or no)"
+        );
+        break;
+      case 8:
+        updatedInfo.rash = userInput.toLowerCase().includes("yes");
+        
+        // Calculate appointment length and determine specialty
+        const appointmentLength = calculateAppointmentLength(updatedInfo);
+        let specialtyArea = "General Practice";
+        if (updatedInfo.stiffNeck && updatedInfo.fever && updatedInfo.lightSensitive) {
+          specialtyArea = "Emergency Medicine";
+        } else if (updatedInfo.rash && updatedInfo.fever) {
+          specialtyArea = "Urgent Care";
+        }
+
+        // Create presentation summary
+        const presentation = `Patient presenting with ${updatedInfo.symptoms}${
+          updatedInfo.medication ? `, has taken ${updatedInfo.medication}` : ", no medications taken"
+        }. Key symptoms: ${[
+          updatedInfo.fever ? "fever" : "",
+          updatedInfo.stiffNeck ? "stiff neck" : "",
+          updatedInfo.lightSensitive ? "light sensitivity" : "",
+          updatedInfo.rash ? "rash" : "",
+        ].filter(Boolean).join(", ")}`;
+
         setSummary({
-          appointmentLength: 30, // This would be calculated based on responses
-          specialtyArea: "General Practice",
-          presentation: "Patient presenting with multiple symptoms requiring evaluation",
+          appointmentLength,
+          specialtyArea,
+          presentation,
         });
+
         await simulateTyping(
           "Thank you! I've sent your information to your GP, they should get back to you soon!"
         );
@@ -86,6 +173,8 @@ export const TriageChat = () => {
         });
         break;
     }
+    setPatientInfo(updatedInfo);
+    setStage((prev) => prev + 1);
   };
 
   return (
