@@ -13,6 +13,16 @@ export const ChatInput = ({ userInput, setUserInput, handleSubmit, lastBotMessag
     setUserInput(text);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const form = e.currentTarget.closest('form');
+      if (form) {
+        form.requestSubmit();
+      }
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="mt-4">
       <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
@@ -21,6 +31,7 @@ export const ChatInput = ({ userInput, setUserInput, handleSubmit, lastBotMessag
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Type your response..."
           className="flex-1 rounded-xl border-2 border-transparent bg-white px-4 py-3 text-gray-900 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-mint-300 focus:outline-none focus:ring-4 focus:ring-mint-100 font-mono text-base sm:text-lg"
         />
