@@ -15,7 +15,7 @@ export const SummaryCard = ({
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="rounded-xl bg-white p-6 shadow-lg"
+      className="rounded-xl bg-white p-4 shadow-lg sm:p-6"
     >
       <h3 className="mb-4 text-lg font-semibold text-gray-900">Triage Summary</h3>
       <div className="space-y-3">

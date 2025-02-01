@@ -103,9 +103,9 @@ export const TriageChat = () => {
   const lastBotMessage = messages.filter(m => m.isBot).pop()?.text || '';
 
   return (
-    <div className="mx-auto flex h-screen max-w-2xl flex-col bg-gray-50 p-4">
+    <div className="flex min-h-screen w-full flex-col bg-gray-50 px-2 py-4 sm:px-4">
       <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[95vw] sm:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-600">Emergency Warning</AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
@@ -126,7 +126,7 @@ export const TriageChat = () => {
 
       <Header />
 
-      <div className="relative flex-1 overflow-y-auto rounded-xl bg-gray-100 p-4">
+      <div className="relative flex-1 overflow-y-auto rounded-xl bg-gray-100 p-2 sm:p-4">
         <EncryptionNotice />
         <ChatContainer messages={messages} isTyping={isTyping} />
       </div>
