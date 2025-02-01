@@ -43,11 +43,12 @@ export const SpeechControls = ({ onSpeechInput, lastBotMessage }: SpeechControls
   const toggleListening = async () => {
     if (!isListening) {
       try {
-        const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
 
-        recognition.onresult = (event) => {
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
           const transcript = Array.from(event.results)
             .map(result => result[0])
             .map(result => result.transcript)
