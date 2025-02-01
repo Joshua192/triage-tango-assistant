@@ -20,7 +20,7 @@ export const ChatMessage = ({ message, isBot, animate = true }: ChatMessageProps
       variants={variants}
       transition={{ duration: 0.3, ease: "easeOut" }}
       className={cn(
-        "mb-4 max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
+        "mb-4 max-w-[80%] rounded-2xl px-4 py-3 text-lg leading-relaxed shadow-sm font-mono",
         isBot
           ? "mr-auto bg-white text-gray-800"
           : "ml-auto bg-mint-500 text-white"

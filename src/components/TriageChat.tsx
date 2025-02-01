@@ -15,6 +15,7 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { SpeechControls } from './SpeechControls';
 
 interface Message {
   text: string;
@@ -195,6 +196,12 @@ export const TriageChat = () => {
     setStage((prev) => prev + 1);
   };
 
+  const lastBotMessage = messages.filter(m => m.isBot).pop()?.text || '';
+
+  const handleSpeechInput = (text: string) => {
+    setUserInput(text);
+  };
+
   return (
     <div className="mx-auto flex h-screen max-w-2xl flex-col bg-gray-50 p-4">
       <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
@@ -219,8 +226,8 @@ export const TriageChat = () => {
 
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Medical Triage Assistant</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-gill font-semibold text-gray-900">Medical Triage Assistant</h1>
+          <p className="text-sm font-gill text-gray-500">
             Please answer the questions to help us assess your needs.
           </p>
         </div>
@@ -231,7 +238,7 @@ export const TriageChat = () => {
         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
           <div className="bg-black/20 backdrop-blur-sm rounded-lg p-3 text-white text-sm flex items-center justify-center space-x-2">
             <Lock className="h-4 w-4" />
-            <span>Messages in this chat are end-to-end (hypothetically) encrypted with Quantum Encryption Protocols</span>
+            <span className="font-mono">Messages in this chat are end-to-end (hypothetically) encrypted with Quantum Encryption Protocols</span>
           </div>
         </div>
         <div className="space-y-4 pt-14">
@@ -262,16 +269,19 @@ export const TriageChat = () => {
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             placeholder="Type your response..."
-            className="flex-1 rounded-xl border-2 border-transparent bg-white px-4 py-3 text-gray-900 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-mint-300 focus:outline-none focus:ring-4 focus:ring-mint-100"
+            className="flex-1 rounded-xl border-2 border-transparent bg-white px-4 py-3 text-gray-900 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-mint-300 focus:outline-none focus:ring-4 focus:ring-mint-100 font-mono text-lg"
           />
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            className="rounded-xl bg-mint-500 px-6 py-3 font-medium text-white shadow-sm transition-all duration-200 hover:bg-mint-600 focus:outline-none focus:ring-4 focus:ring-mint-100"
-          >
-            Send
-          </motion.button>
+          <div className="flex space-x-2">
+            <SpeechControls onSpeechInput={handleSpeechInput} lastBotMessage={lastBotMessage} />
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              className="rounded-xl bg-mint-500 px-6 py-3 font-medium text-white shadow-sm transition-all duration-200 hover:bg-mint-600 focus:outline-none focus:ring-4 focus:ring-mint-100"
+            >
+              Send
+            </motion.button>
+          </div>
         </div>
       </form>
     </div>
