@@ -17,6 +17,7 @@ export const TriageChat = () => {
   const [userInput, setUserInput] = useState("");
   const [stage, setStage] = useState(0);
   const [showAlert, setShowAlert] = useState(true);
+  const [showTriggerWarning, setShowTriggerWarning] = useState(false);
   const [patientInfo, setPatientInfo] = useState<PatientInfo>({
     symptoms: "",
     duration: "",
@@ -43,9 +44,24 @@ export const TriageChat = () => {
     addMessage(message, true);
   };
 
+  const checkForTriggerWords = (input: string) => {
+    const triggerWords = ["kill", "die"];
+    return triggerWords.some(word => input.toLowerCase().includes(word));
+  };
+
+  const isValidYesNoAnswer = (input: string) => {
+    const normalizedInput = input.toLowerCase().trim();
+    return normalizedInput === "yes" || normalizedInput === "no";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userInput.trim()) return;
+
+    if (checkForTriggerWords(userInput)) {
+      setShowTriggerWarning(true);
+      return;
+    }
 
     addMessage(userInput, false);
     setUserInput("");
@@ -70,18 +86,34 @@ export const TriageChat = () => {
         await simulateTyping("Do you have a fever? (Please answer yes or no)");
         break;
       case 4:
+        if (!isValidYesNoAnswer(userInput)) {
+          await simulateTyping("Please answer with 'yes' or 'no'. Do you have a fever?");
+          return;
+        }
         updatedInfo.fever = userInput.toLowerCase().includes("yes");
         await simulateTyping("Are you experiencing any sensitivity to light? (Please answer yes or no)");
         break;
       case 5:
+        if (!isValidYesNoAnswer(userInput)) {
+          await simulateTyping("Please answer with 'yes' or 'no'. Are you experiencing any sensitivity to light?");
+          return;
+        }
         updatedInfo.lightSensitive = userInput.toLowerCase().includes("yes");
         await simulateTyping("Do you have a stiff neck? (Please answer yes or no)");
         break;
       case 6:
+        if (!isValidYesNoAnswer(userInput)) {
+          await simulateTyping("Please answer with 'yes' or 'no'. Do you have a stiff neck?");
+          return;
+        }
         updatedInfo.stiffNeck = userInput.toLowerCase().includes("yes");
         await simulateTyping("Have you noticed any recent onset of rash? (Please answer yes or no)");
         break;
       case 7:
+        if (!isValidYesNoAnswer(userInput)) {
+          await simulateTyping("Please answer with 'yes' or 'no'. Have you noticed any recent onset of rash?");
+          return;
+        }
         updatedInfo.rash = userInput.toLowerCase().includes("yes");
         
         if (checkEmergencyConditions(updatedInfo)) {
@@ -97,7 +129,9 @@ export const TriageChat = () => {
         break;
     }
     setPatientInfo(updatedInfo);
-    setStage((prev) => prev + 1);
+    if (isValidYesNoAnswer(userInput) || stage < 4) {
+      setStage((prev) => prev + 1);
+    }
   };
 
   const lastBotMessage = messages.filter(m => m.isBot).pop()?.text || '';
@@ -116,6 +150,20 @@ export const TriageChat = () => {
                 <li>Neck stiffness</li>
                 <li>New onset rash</li>
               </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>I understand</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showTriggerWarning} onOpenChange={setShowTriggerWarning}>
+        <AlertDialogContent className="max-w-[95vw] sm:max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-600">Urgent Notice</AlertDialogTitle>
+            <AlertDialogDescription>
+              It seems you have mentioned high-risk behaviour. Please exit this chat and call 999 to speak to a human.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
