@@ -9,8 +9,8 @@ export const TriageLogo = () => {
       className="relative w-24 h-32 bg-white rounded-lg shadow-md p-2"
     >
       {/* Person silhouette */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 bg-gray-200 rounded-full" /> {/* Head */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-16 h-20 bg-gray-200 rounded-lg"> {/* Body */}
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-10 bg-gray-200 rounded-full" /> {/* Head */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-14 h-16 bg-gray-200 rounded-lg"> {/* Body */}
         {/* Red cross */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10">
           <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-2 bg-red-500 rounded" />
