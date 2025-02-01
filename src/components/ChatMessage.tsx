@@ -22,8 +22,8 @@ export const ChatMessage = ({ message, isBot, animate = true }: ChatMessageProps
       className={cn(
         "mb-4 max-w-[80%] rounded-2xl px-4 py-3 text-lg leading-relaxed shadow-sm font-mono",
         isBot
-          ? "mr-auto bg-white text-gray-800"
-          : "ml-auto bg-mint-500 text-white"
+          ? "mr-auto bg-white text-gray-800 shadow-md"
+          : "ml-auto bg-mint-500 text-white shadow-md"
       )}
     >
       {message}
