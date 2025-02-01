@@ -148,15 +148,15 @@ export const TriageChat = () => {
           specialtyArea = "Urgent Care";
         }
 
-        // Create presentation summary
-        const presentation = `Patient presenting with ${updatedInfo.symptoms}${
-          updatedInfo.medication ? `, has taken ${updatedInfo.medication}` : ", no medications taken"
-        }. Key symptoms: ${[
+        // Create more concise presentation summary
+        const symptoms = [
           updatedInfo.fever ? "fever" : "",
           updatedInfo.stiffNeck ? "stiff neck" : "",
           updatedInfo.lightSensitive ? "light sensitivity" : "",
           updatedInfo.rash ? "rash" : "",
-        ].filter(Boolean).join(", ")}`;
+        ].filter(Boolean);
+
+        const presentation = `Patient presents with ${updatedInfo.symptoms.toLowerCase()}${symptoms.length > 0 ? `, notable for ${symptoms.join(", ")}` : ""}${updatedInfo.medication ? `; has taken ${updatedInfo.medication}` : "; no medications taken"}.`;
 
         setSummary({
           appointmentLength,
