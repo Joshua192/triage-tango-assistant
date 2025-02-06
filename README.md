@@ -1,6 +1,8 @@
-# hackathon-with-lovable
+# Goldborne Medical AI Hackathon (developed with lovable)
 Product created for the 'Goldborne Medical Centre' AI Hackathon held on Sat 01st Feb 2025.
-The Application is a chatbot responsible for pre-screening patients at their GP Office.
+The hackathon allowed participants to create teams of four to five people and utilise an AI tool known as Lovable.dev to create an AI-based product (application, website or other) to address a specific pain point within the NHS system.
+
+The Application my team created is a chatbot responsible for pre-screening patients at their GP Office.
 1. It asks a series of increasingly closed-ended questions to ascertain:
   - Estimated Appointment Length (5-20 minutes).
   - Reccommended Specialist 
